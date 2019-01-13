@@ -1,0 +1,3 @@
+---
+- include: oxs_packages.yml
+  when: ansible_os_family == "Darwin"
