@@ -1,0 +1,19 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_user: vagrant
+    ansible_ssh_pass: vagrant
+    ansible_host: localhost
+    ansible_become: true
+    security_mode: plaintext
+vagrant:
+  hosts:
+    master:
+      ansible_port: 2300
+    worker1:
+      ansible_port: 2301
+    worker2:
+      ansible_port: 2302
+    worker3:
+      ansible_port: 2303
+

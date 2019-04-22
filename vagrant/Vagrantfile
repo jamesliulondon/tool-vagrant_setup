@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+BOX = "bento/centos-7.5"
+
+
+VAGRANTFILE_API_VERSION = "2"
+
+cluster = {
+  "master" => { :ip => "192.168.33.10", :cpus => 1, :mem => 3096, :p80 => 180, :p443 => 1443, :p2300 => 2300, :p8080 => 18080 },
+  "slave1" => { :ip => "192.168.33.11", :cpus => 1, :mem => 3096, :p80 => 181, :p443 => 443, :p2300 => 2301, :p8080 => 18081 },
+  "slave2" => { :ip => "192.168.33.12", :cpus => 1, :mem => 3096, :p80 => 182, :p443 => 1445, :p2300 => 2302, :p8080 => 18082 },
+  "slave3" => { :ip => "192.168.33.13", :cpus => 1, :mem => 1024, :p80 => 183, :p443 => 1446, :p2300 => 2303, :p8080 => 18083 }
+}
+ 
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  cluster.each_with_index do |(hostname, info), index|
+
+    config.vm.define hostname do |cfg|
+      cfg.vm.provider :virtualbox do |vb, override|
+        config.vm.box = BOX
+        override.vm.network :private_network, ip: "#{info[:ip]}"
+        override.vm.hostname = hostname
+        vb.name = hostname
+        vb.customize ["modifyvm", :id, "--memory", info[:mem], "--cpus", info[:cpus], "--hwvirtex", "on"]
+	config.vm.network "forwarded_port", guest: 8080, host: info[:p8080]
+	config.vm.network "forwarded_port", guest: 80, host: info[:p80]
+	config.vm.network "forwarded_port", guest: 443, host: info[:p443]
+	config.vm.network "forwarded_port", guest: 22, host: info[:p2300]
+      end # end provider
+    end # end config
+
+  end # end cluster
+
+  config.vm.provision "shell", inline: "mkdir -p /opt/repo"
+
+  config.vm.synced_folder "yumcache", "/var/cache/yum"
+  config.vm.synced_folder "repo", "/opt/repo"
+
+  config.vm.provision "shell", inline: "[[ -r /vagrant/repo/bootstrap.sh ]] && cd /vagrant/repo && ./bootstrap.sh"
+
+end

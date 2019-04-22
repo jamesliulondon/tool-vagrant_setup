@@ -1,6 +1,0 @@
----
-- name: Download OSX 
-  get_url:
-    url: https://download.virtualbox.org/virtualbox/6.0.0/VirtualBox-6.0.0-127566-OSX.dmg
-    dest: /tmp/Virtualbox.dmg
- 

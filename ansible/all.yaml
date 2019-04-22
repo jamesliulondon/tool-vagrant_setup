@@ -1,0 +1,6 @@
+---
+- hosts: vagrant
+  tasks:
+  - name: setup
+    command: echo 'hello'
+
